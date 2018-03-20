@@ -3,6 +3,10 @@
 
 A Python wrapper for the stubhub inventory search API. You can see the full tutorial in the [Stubhub API.ipynb](https://github.com/KobaKhit/stubhubAPI/blob/master/Stubhub%20API.ipynb)
 
+![png](readme_plots/heatmap.png)
+
+## Getting Started
+
 ```python
 from stubhub_scraper import St
 
