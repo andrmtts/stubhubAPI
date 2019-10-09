@@ -1,7 +1,7 @@
 
 # Stubhub API
 
-A Python wrapper for the stubhub inventory search API. You can see the full tutorial in the [Stubhub API.ipynb](https://github.com/KobaKhit/stubhubAPI/blob/master/Stubhub%20API.ipynb)
+A Python wrapper for the stubhub inventory search API. You can see the full tutorial in the [Stubhub API.ipynb](https://nbviewer.jupyter.org/github/KobaKhit/stubhubAPI/blob/master/Stubhub%20API%20Tutorial.ipynb)
 
 ![png](readme_plots/heatmap.png)
 
