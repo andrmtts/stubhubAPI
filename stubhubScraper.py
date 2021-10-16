@@ -1,11 +1,11 @@
 import requests
 import base64
-import pprint
 
 import pandas as pd
-import json
 from tqdm import tqdm
 from time import gmtime, strftime
+
+import json
 
 # authorization
 # https://developer.stubhub.com/docs/StubHub+API+Developers+Guide.html
@@ -40,7 +40,13 @@ class St(object):
 						'Accept': 'application/json',
 						'Accept-Encoding': 'application/json'}
 
-	def process_listings(self,listings):
+	def process_listings(self,listings, event_id):
+		'''
+		Process listings obtained from Stubhub API
+		Args:
+		- listings - a list of stubhub listings
+		'''
+
 		# Process listings obtained from Stubhub API
 		# Args:
 		# - listings - a list of stubhub listings
@@ -61,15 +67,20 @@ class St(object):
 			# get seatnumbers if those are in listing
 			ret['seatNumbers'] = k['seatNumbers'].replace(',',';') if 'seatNumbers' in k else 'NA'
 			ret['retrieveTime'] = strftime("%Y-%m-%d %H:%M:%S", gmtime()) # time of request
+			ret['event id'] = event_id # add event id
 			l.append(ret) # append to list
 
 		return(l)
 
 	def get_listings(self,eventid,pages=False):
-		# Get listings using Stubhub API
-		# Args:
-		# - eventid: integer - eventid taken from the Stubhub event url
-		# - pages: bool - paginate to get all listings
+		'''
+		Get listings using Stubhub API
+		Args:
+		- eventid: integer - eventid taken from the Stubhub event url
+		- pages: bool - paginate to get all listings
+		
+		'''
+		
 
 		req_count = 0 # api limit count
 		inventory_url = 'https://api.stubhub.com/search/inventory/v2'
@@ -84,6 +95,7 @@ class St(object):
 			print('Event: ',eventid, 'has 0 listings')
 			return
 
+		event_id = inventory['eventId']
 		total_listings = inventory['totalListings']
 
 		if pages is True: # loop through all pages 
@@ -97,14 +109,18 @@ class St(object):
 		inventory['rows'] = total_listings # total number of listings
 		if 'minQuantity' in inventory: del inventory['minQuantity'] # remove unnecessary key value pairs
 		if 'maxQuantity' in inventory: del inventory['maxQuantity']
-		inv = self.process_listings(inventory['listing']) # process listings
+		inv = self.process_listings(inventory['listing'], event_id) # process listings
 
 		return(inv)
 
 	def get_listings_by_event(self,events):
-		# Given the list of events and event ids retrieve all the listings for each event 
-		# Args:
-		# - events - a dataframe of events and event ids on stubhub
+		'''
+		Given the list of events and event ids retrieve all the listings for each event 
+		Args:
+		- events - a dataframe of events and event ids on stubhub
+		
+		'''
+	
 		listings = []
 		t = tqdm(events[['Event','Eventid']].itertuples(index=False))
 		for event, eid in t:
@@ -128,6 +144,13 @@ def main():
 	stubhub_password = ''
 
 	st = St(app_token,consumer_key,consumer_secret,stubhub_username,stubhub_password)
+
+	events = pd.read_csv('flyers events 2018.csv')
+
+	listings = st.get_listings_by_event(events)
+	listings.to_csv('flyers listings.csv')
+
+	return
 
 
 if __name__ == '__main__':
